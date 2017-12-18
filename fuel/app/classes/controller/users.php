@@ -9,24 +9,24 @@ class Controller_Users extends Controller_Rest
         try {
             if (!isset($_POST['username']) || !isset($_POST['password']) || !isset($_POST['email']) || $_POST['username'] == "" || $_POST['password'] == "" || $_POST['email'] == "") 
             {
-              $this->createResponse(400, 'Required username and password');
+              $this->response(400, 'Required username and password');
             }
             $username = $_POST['username'];
             $password = $_POST['password'];
             $email = $_POST['email'];
 
-            if(!$this->userExists($username, $email)){
+            if(!$this->userInDB($username, $email)){
                 $userData = array('username' => $username, 'password' => $password, 'email' => $email);
                 $new = new Model_Users($userData);
                 $new->save();
-                $this->createResponse(200, 'Usuario creado', ['user' => $new]);
+                $this->response(200, 'Usuario creado', ['user' => $new]);
             }else{
-                $this->createResponse(400, 'User already created');
+                $this->response(400, 'User already created');
             } 
        }
         catch (Exception $e) 
         {
-            $this->createResponse(500, $e->getMessage());
+            $this->response(500, $e->getMessage());
         }      
         
    }
@@ -34,7 +34,7 @@ class Controller_Users extends Controller_Rest
    {
     try{
         if (!isset($_POST['username']) || !isset($_POST['password']) || $_POST['username'] == "" || $_POST['password'] == "") {
-            $this->createResponse(400, 'Incorrect username or password');
+            $this->response(400, 'Incorrect username or password');
         }
      	  $username = $_GET['username'];
   	    $password = $_GET['password'];
@@ -58,12 +58,12 @@ class Controller_Users extends Controller_Rest
 
       		$jwt = JWT::encode($token, $this->key);
 
-            $this->createResponse(200, 'Correct Data', ['token' => $jwt]);
+            $this->response(200, 'Correct Data', ['token' => $jwt]);
       	}else{
-            $this->createResponse(400, 'User doesnt exist');
+            $this->response(400, 'User doesnt exist');
       	}
     }catch (Exception $e){
-        $this->createResponse(500, $e->getMessage());
+        $this->response(500, $e->getMessage());
     }  
   }
 
@@ -71,7 +71,7 @@ class Controller_Users extends Controller_Rest
   {
     try{
         $jwt = apache_request_headers()['Authorization'];
-        if($this->validateToken($jwt)){
+        if($this->tokenValidated($jwt)){
 
             $editPass = $_POST['password'];
             $token = JWT::decode($jwt, $this->key, array('HS256'));
@@ -81,16 +81,16 @@ class Controller_Users extends Controller_Rest
             if($user != null){
                 $user->password = $editPass;
                 $user->save();
-                $this->createResponse(200, 'Data saved', ['user' => $user]);
+                $this->response(200, 'Data saved', ['user' => $user]);
             }else{
-                $this->createResponse(400, 'User doesnt exist');
+                $this->response(400, 'User doesnt exist');
             }
                 
         }else{
-            $this->createResponse(400, 'Permission denied');
+            $this->response(400, 'Permission denied');
         }
     }catch (Exception $e){
-        $this->createResponse(500, $e->getMessage());
+        $this->response(500, $e->getMessage());
     } 
   }
 
@@ -99,27 +99,27 @@ class Controller_Users extends Controller_Rest
     try{
         $jwt = apache_request_headers()['Authorization'];
 
-        if($this->validateToken($jwt)){
+        if($this->tokenValidated($jwt)){
             $token = JWT::decode($jwt, $this->key, array('HS256'));
             $id = $token->data->id;
            
             $user = Model_Users::find($id);
             if($user != null){
                 $user->delete();
-                $this->createResponse(200, 'User deleted', ['user' => $user]);
+                $this->response(200, 'User deleted', ['user' => $user]);
             }else{
-                $this->createResponse(400, 'User doesnt exist');
+                $this->response(400, 'User doesnt exist');
             }
               
         }else{
-            $this->createResponse(400, 'Permission denied');
+            $this->response(400, 'Permission denied');
         }
     }catch (Exception $e){
-        $this->createResponse(500, $e->getMessage());
+        $this->response(500, $e->getMessage());
     }  
   }
 
-  function userExists($username, $email)
+  function userInDB($username, $email)
   {
     $userData = Model_Users::find('all', array(
                     'where' => array(
@@ -136,7 +136,7 @@ class Controller_Users extends Controller_Rest
     }
   }
 
-  function validateToken($jwt)
+  function tokenValidated($jwt)
   {
     $token = JWT::decode($jwt, $this->key, array('HS256'));
     $username = $token->data->username;
@@ -154,7 +154,7 @@ class Controller_Users extends Controller_Rest
     }
   }
 
-  function createResponse($code, $message, $data = [])
+  function response($code, $message, $data = [])
   {
     $json = $this->response(array(
               'code' => $code,
