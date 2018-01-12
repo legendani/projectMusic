@@ -1,5 +1,6 @@
 <?php
 use Firebase\JWT\JWT;
+
 class Controller_Users extends Controller_Rest
 {
 	private $key = 'lihkj3n2oirfhne982h3brf7sd89fyhgb738uibHJGu892734bjkb';
@@ -9,7 +10,11 @@ class Controller_Users extends Controller_Rest
         try {
             if (!isset($_POST['username']) || !isset($_POST['password']) || !isset($_POST['email']) || $_POST['username'] == "" || $_POST['password'] == "" || $_POST['email'] == "") 
             {
-              $this->response(400, 'Required username and password');
+              $json = $this->response(array(
+              'code' => 400,
+              'message' => 'Required username and password',
+              ));
+              return $json;
             }
             $username = $_POST['username'];
             $password = $_POST['password'];
@@ -19,9 +24,18 @@ class Controller_Users extends Controller_Rest
                 $userData = array('username' => $username, 'password' => $password, 'email' => $email);
                 $new = new Model_Users($userData);
                 $new->save();
-                $this->response(200, 'Usuario creado', ['user' => $new]);
+                $json = $this->response(array(
+                'code' => 200,
+                'message' => 'Correct data',
+                'data' => $new
+                ));
+                return $json;
             }else{
-                $this->response(400, 'User already created');
+                $json = $this->response(array(
+              'code' => 400,
+              'message' => 'Incorrect data',
+              ));
+              return $json;
             } 
        }
         catch (Exception $e) 
@@ -33,9 +47,15 @@ class Controller_Users extends Controller_Rest
    function get_login()
    {
     try{
-        if (!isset($_POST['username']) || !isset($_POST['password']) || $_POST['username'] == "" || $_POST['password'] == "") {
-            $this->response(400, 'Incorrect username or password');
+        if (!isset($_POST['username']) || !isset($_POST['password']) || $_POST['username'] == "" || $_POST['password'] == "") 
+        {
+            $json = $this->response(array(
+              'code' => 400,
+              'message' => 'Incorrect data',
+              ));
+            return $json;
         }
+
      	  $username = $_GET['username'];
   	    $password = $_GET['password'];
 
@@ -48,7 +68,6 @@ class Controller_Users extends Controller_Rest
       	if($findUser != null){
       		$time = time();
       		$token = array(
-      		    'iat' => $time, 
       		    'data' => [ 
                   'id' => $findUser['id'],
       		        'username' => $username,
@@ -58,12 +77,25 @@ class Controller_Users extends Controller_Rest
 
       		$jwt = JWT::encode($token, $this->key);
 
-            $this->response(200, 'Correct Data', ['token' => $jwt]);
+          $json = $this->response(array(
+              'code' => 200,
+              'message' => 'Correct data',
+              'data' => $token
+              ));
+                return $json;
       	}else{
-            $this->response(400, 'User doesnt exist');
+            $json = $this->response(array(
+              'code' => 400,
+              'message' => 'User doesnt exist',
+              ));
+              return $json;
       	}
     }catch (Exception $e){
-        $this->response(500, $e->getMessage());
+        $json = $this->response(array(
+              'code' => 500,
+              'message' => 'Internal error',
+        ));
+        return $json;
     }  
   }
 
@@ -71,7 +103,8 @@ class Controller_Users extends Controller_Rest
   {
     try{
         $jwt = apache_request_headers()['Authorization'];
-        if($this->tokenValidated($jwt)){
+        if($this->tokenValidated($jwt))
+        {
 
             $editPass = $_POST['password'];
             $token = JWT::decode($jwt, $this->key, array('HS256'));
@@ -81,16 +114,33 @@ class Controller_Users extends Controller_Rest
             if($user != null){
                 $user->password = $editPass;
                 $user->save();
-                $this->response(200, 'Data saved', ['user' => $user]);
+                $json = $this->response(array(
+                'code' => 200,
+                'message' => 'User edited',
+                'data' => $user
+                ));
+                return $json;
             }else{
-                $this->response(400, 'User doesnt exist');
+                $json = $this->response(array(
+              'code' => 400,
+              'message' => 'User doesnt exist',
+              ));
+              return $json;
             }
                 
         }else{
-            $this->response(400, 'Permission denied');
+            $json = $this->response(array(
+              'code' => 400,
+              'message' => 'Permission denied',
+              ));
+              return $json;
         }
     }catch (Exception $e){
-        $this->response(500, $e->getMessage());
+        $json = $this->response(array(
+              'code' => 500,
+              'message' => 'Internal error',
+        ));
+        return $json;
     } 
   }
 
@@ -99,23 +149,41 @@ class Controller_Users extends Controller_Rest
     try{
         $jwt = apache_request_headers()['Authorization'];
 
-        if($this->tokenValidated($jwt)){
+        if($this->tokenValidated($jwt))
+        {
             $token = JWT::decode($jwt, $this->key, array('HS256'));
             $id = $token->data->id;
            
             $user = Model_Users::find($id);
             if($user != null){
                 $user->delete();
-                $this->response(200, 'User deleted', ['user' => $user]);
+                $json = $this->response(array(
+                'code' => 200,
+                'message' => 'User deleted',
+                'data' => $user
+                ));
+                return $json;
             }else{
-                $this->response(400, 'User doesnt exist');
+              $json = $this->response(array(
+              'code' => 400,
+              'message' => 'User doesnt exist',
+              ));
+              return $json;
             }
               
         }else{
-            $this->response(400, 'Permission denied');
+            $json = $this->response(array(
+              'code' => 400,
+              'message' => 'Permission Denied',
+        ));
+        return $json;
         }
     }catch (Exception $e){
-        $this->response(500, $e->getMessage());
+        $json = $this->response(array(
+              'code' => 500,
+              'message' => 'Internal error',
+        ));
+        return $json;
     }  
   }
 
@@ -152,15 +220,5 @@ class Controller_Users extends Controller_Rest
     }else{
         return false;
     }
-  }
-
-  function response($code, $message, $data = [])
-  {
-    $json = $this->response(array(
-              'code' => $code,
-              'message' => $message,
-              'data' => $data
-        ));
-    return $json;
   }
 }
