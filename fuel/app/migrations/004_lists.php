@@ -1,25 +1,25 @@
 <?php
 namespace Fuel\Migrations;
 
-class Listas
+class Lists
 {
 
     function up()
     {
-        \DBUtil::create_table('listas', array(
+        \DBUtil::create_table('lists', array(
             'id' => array('type' => 'int', 'constraint' => 5, 'auto_increment' => true),
-            'titulo' => array('type' => 'varchar', 'constraint' => 100),
-            'editable' => array('type' => 'varchar', 'constraint' => 100),
-            'id_usuario' => array('type' => 'int', 'constraint' => 5),
+            'title' => array('type' => 'varchar', 'constraint' => 100),
+            'editable' => array('type' => 'bool'),
+            'id_user' => array('type' => 'int', 'constraint' => 5),
         ),
 
         array('id'), false, 'InnoDB', 'utf8',
             array(
                 array(
-                    'constraint' => 'claveAjenaListasAUsuarios',
-                    'key' => 'id_usuario',
+                    'constraint' => 'claveAjenaListsAUsers',
+                    'key' => 'id_user',
                     'reference' => array(
-                        'table' => 'usuarios',
+                        'table' => 'users',
                         'column' => 'id',
                     ),
                     'on_update' => 'CASCADE',

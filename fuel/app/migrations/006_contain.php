@@ -1,33 +1,33 @@
 <?php
 namespace Fuel\Migrations;
 
-class Seguir
+class Contain
 {
 
     function up()
     {
-        \DBUtil::create_table('seguir', array(
-            'id_seguido' => array('type' => 'int', 'constraint' => 5),
-            'id_seguidor' => array('type' => 'int', 'constraint' => 5)
+        \DBUtil::create_table('contain', array(
+            'id_lists' => array('type' => 'int', 'constraint' => 5),
+            'id_songs' => array('type' => 'int', 'constraint' => 5)
         ),
 
-        array('id_seguido', 'id_seguidor'), false, 'InnoDB', 'utf8_unicode_ci',
+        array('id_lists', 'id_songs'), false, 'InnoDB', 'utf8_unicode_ci',
             array(
                 array(
-                    'constraint' => 'claveAjenaSeguidoAUsuarios',
-                    'key' => 'id_seguido',
+                    'constraint' => 'claveAjenaContainALists',
+                    'key' => 'id_lists',
                     'reference' => array(
-                        'table' => 'usuarios',
+                        'table' => 'lists',
                         'column' => 'id',
                     ),
                     'on_update' => 'CASCADE',
                     'on_delete' => 'RESTRICT'
                 ),
                 array(
-                    'constraint' => 'claveAjenaSeguidorAUsuarios',
-                    'key' => 'id_seguidor',
+                    'constraint' => 'claveAjenaContainASongs',
+                    'key' => 'id_songs',
                     'reference' => array(
-                        'table' => 'usuarios',
+                        'table' => 'songs',
                         'column' => 'id',
                     ),
                     'on_update' => 'CASCADE',
@@ -39,6 +39,6 @@ class Seguir
 
     function down()
     {
-       \DBUtil::drop_table('contener');
+       \DBUtil::drop_table('contain');
     }
 }
