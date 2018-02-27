@@ -157,7 +157,7 @@ class Controller_News extends Controller_Rest
 		$id = $token->data->id;
 		$title = $_GET['title'];
 
-		$userDB = Model_Usuarios::find('all', array(
+		$userDB = Model_Users::find('all', array(
 			'where' => array(
 				array('username', $username),
 				array('password', $password)

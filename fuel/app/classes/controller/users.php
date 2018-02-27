@@ -103,7 +103,7 @@ class Controller_Users extends Controller_Rest
 
 	    if(count($userDB) == 1){
 	        $allUsers = Model_Users::find('all');
-	        $this->Mensaje('200', 'Users list', $allusers);
+	        $this->Mensaje('200', 'Users list', $allUsers);
 	    }else {
 	        $this->Mensaje('400', 'User not valid', $username);
 	    }
@@ -201,7 +201,7 @@ class Controller_Users extends Controller_Rest
 	            $new->username = 'admin';
 	            $new->email = 'admin@admin.com';
 	            $new->password = 'password';
-	            $new->id_rol = '1';
+	            $new->id_roles = '1';
 	            $new->x = '0';
 	            $new->y = '0';
 	            $new->id_device = '0';
@@ -302,7 +302,7 @@ class Controller_Users extends Controller_Rest
 	                array('id_follower', $id)
 	                ),
 	            ));
-	        $this->Mensaje('200', 'Followed users list', $users);
+	        $this->Mensaje('200', 'Followed users list', $followedUsers);
 	    }else {
 	        $this->Mensaje('400', 'User not valid', $username);
 	    }

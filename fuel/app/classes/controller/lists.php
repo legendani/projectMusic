@@ -93,7 +93,7 @@ class Controller_Lists extends Controller_Rest
         $input = $_POST;
         $jwt = apache_request_headers()['Authorization'];
 
-        if (array_key_exists('title', $input)&& array_key_exists('id_item', $input) && array_key_exists('editable', $input)) {
+        if (array_key_exists('title', $input)&& array_key_exists('id_list', $input) && array_key_exists('editable', $input)) {
             $title = $input['title'];
             $id_list = $input['id_list'];
             $editable = $input['editable'];
@@ -110,7 +110,7 @@ class Controller_Lists extends Controller_Rest
             if($userDB != null){
                 $list = Model_Lists::find('first', array(
                     'where' => array(
-                        array('id_usuario', $id),
+                        array('id_user', $id),
                         array('id', $id_list)
                     ),
                 ));
@@ -141,8 +141,8 @@ class Controller_Lists extends Controller_Rest
 
             $containDB = Model_Contain::find('first', array(
                 'where' => array(
-                    array('id_lista', $id_list),
-                    array('id_cancion', $id_song)
+                    array('id_lists', $id_list),
+                    array('id_songs', $id_song)
                     ),
                 ));
 
@@ -201,8 +201,8 @@ class Controller_Lists extends Controller_Rest
 
                 $containDB = Model_Contain::find('first', array(
                         'where' => array(
-                            array('id_lista', $id_list),
-                            array('id_cancion', $id_song)
+                            array('id_lists', $id_list),
+                            array('id_songs', $id_song)
                             ),
                         ));
 

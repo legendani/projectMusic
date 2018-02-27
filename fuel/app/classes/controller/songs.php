@@ -55,9 +55,12 @@ class Controller_Songs extends Controller_Rest
         $token = JWT::decode($jwt, $this->key , array('HS256'));
         $id = $token->data->id;
         $input = $_POST;
-        $id_item = $input['id_item'];
+        $id_song = $input['id_song'];
+        $url = $input['url'];
+        $title = $input['title'];
+        $artist= $input['artist'];
 
-        $BDuser = Model_Users::find('first', array(
+        $userDB = Model_Users::find('first', array(
             'where' => array(
                 array('id', $id)
             ),
@@ -66,7 +69,7 @@ class Controller_Songs extends Controller_Rest
         if($userDB != null){
             $searchSong = Model_Songs::find('first', array(
                 'where' => array(
-                    array('id', $id_item)
+                    array('id', $id_song)
                 ),
             ));
             if($searchSong != null){
